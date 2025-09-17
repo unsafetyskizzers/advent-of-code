@@ -1,54 +1,50 @@
-input = open("input.txt", "r")
+input = open("2015/7/input.txt", "r")
 
 def int16(n):
-    return int(n) % 65535
+    return int(n) & 0b1111111111111111
 
 signals = {}
-no_signals = 1
+
+def get_signal(sig):
+    if sig.isdigit():
+        return int16(sig)
+    elif sig in signals:
+        return signals[sig]
+    else:
+        return -1
+
+command_stack = []
+for line in input:
+    command_stack.append(line.strip().split())
+
 loops = 0
 
-while no_signals > 0 and loops < 10000:
-    no_signals = 0
-    for line in input:
-        command = line.strip().split()
+while command_stack != [] and loops < 10000:
+    for command in command_stack:
         match len(command):
             case 3: # command with 3 parts must be a signal assignment
-                if command[2] not in signals:
-                    signals[command[2]] = int16(command[0])
+                if get_signal(command[0]) > -1:
+                    signals[command[2]] = get_signal(command[0])
+                    command_stack.remove(command)
             case 4: # command with 4 parts must be a NOT gate
-                if command[1] in signals:
-                    if command[3] not in signals:
-                        signals[command[3]] = ~signals[command[1]]
-                else:
-                    no_signals += 1
+                if get_signal(command[1]) > -1:
+                    signals[command[3]] = int16(~int16(get_signal(command[1])))
+                    command_stack.remove(command)
             case 5: # command with 5 parts may be any other gate
-                if command[1] == "AND":
-                    if command[0] in signals and command[2] in signals:
-                        if command[4] not in signals:
-                            signals[command[4]] = signals[command[0]] & signals[command[2]]
-                    else:
-                        no_signal += 1
-                elif command[1] == "OR":
-                    if command[0] in signals and command[2] in signals:
-                        if command[4] not in signals:
-                            signals[command[4]] = signals[command[0]] | signals[command[2]]
-                    else:
-                        no_signal += 1
-                elif command[1] == "LSHIFT":
-                    if command[0] in signals:
-                        if command[4] not in signals:
-                            signals[command[4]] = signals[command[0]] << int(signals[command[2]])
-                    else:
-                        no_signal += 1
-                elif command[1] == "RSHIFT":
-                    if command[0] in signals:
-                        if command[4] not in signals:
-                            signals[command[4]] = signals[command[0]] >> int(signals[command[2]])
-                    else:
-                        no_signal += 1
+                if get_signal(command[0]) > -1 and get_signal(command[2]) > -1:
+                    if command[1] == "AND":
+                        signals[command[4]] = get_signal(command[0]) & get_signal(command[2])
+                    elif command[1] == "OR":
+                        signals[command[4]] = get_signal(command[0]) | get_signal(command[2])
+                    elif command[1] == "LSHIFT":
+                        signals[command[4]] = get_signal(command[0]) << int(command[2])
+                    elif command[1] == "RSHIFT":
+                        signals[command[4]] = get_signal(command[0]) >> int(command[2])
+                    command_stack.remove(command)
+    print(command_stack)
     loops += 1
 
-if loops == 10000:
+if loops >= 10000:
     print("No solution after 10000 loops")
 else:
-    print("Signal of wire a:", signals["a"])
+    print("Signal of wire a:", signals["a"], "after", loops, "loops")
