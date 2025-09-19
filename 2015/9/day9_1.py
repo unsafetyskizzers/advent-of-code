@@ -19,6 +19,8 @@ locations = edges.keys()
 possible_routes = []
 shortest_route = []
 shortest_route_length = 999999
+longest_route = []
+longest_route_length = 0
 
 def all_subroutes(curr_route, full_route):
     if len(curr_route) != len(full_route):
@@ -42,3 +44,13 @@ for route in possible_routes:
         shortest_route = route
 
 print("Shortest route:", shortest_route, "of length", shortest_route_length)
+
+for route in possible_routes:
+    route_length = 0
+    for i in range(len(route)-1): 
+        route_length += edges[route[i]][route[i+1]]
+    if route_length > longest_route_length:
+        longest_route_length = route_length
+        longest_route = route
+
+print("Longest route:", longest_route, "of length", longest_route_length)
