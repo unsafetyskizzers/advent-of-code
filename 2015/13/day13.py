@@ -25,8 +25,6 @@ for line in input:
     else:
         net_happiness_map[command[10]] = { command[0]: happy_delta }
 
-print(net_happiness_map)
-
 def greedy_arrangement(curr_arr, all_guests):
     if len(curr_arr) == len(all_guests):
         return curr_arr
@@ -57,4 +55,27 @@ for arr in seating_arrangements:
         best_arrangement_happiness = arrangement_happiness
         best_arrangement = arr
 
-print("Best arrangement:", best_arrangement, "with score", best_arrangement_happiness)
+print("Best arrangement (part 1):", best_arrangement, "with score", best_arrangement_happiness)
+
+for guest in net_happiness_map.keys():
+    net_happiness_map[guest]["Me"] = 0
+net_happiness_map["Me"] = {}
+for guest in net_happiness_map.keys():
+    if guest != "Me":
+        net_happiness_map["Me"][guest] = 0
+
+seating_arrangements_andme = []
+for guest in net_happiness_map.keys():
+    seating_arrangements_andme.append(greedy_arrangement([guest], net_happiness_map.keys()))
+
+best_arrangement_andme = []
+best_arrangement_happiness_andme = 0
+for arr in seating_arrangements_andme:
+    arrangement_happiness = 0
+    for i in range(len(arr)):
+        arrangement_happiness += net_happiness_map[arr[i]][arr[i-1]]
+    if arrangement_happiness > best_arrangement_happiness_andme:
+        best_arrangement_happiness_andme = arrangement_happiness
+        best_arrangement_andme = arr
+
+print("Best arrangement (part 2):", best_arrangement_andme, "with score", best_arrangement_happiness_andme)
