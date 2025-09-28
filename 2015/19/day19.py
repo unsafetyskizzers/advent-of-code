@@ -37,6 +37,7 @@ molecule_tree = ["e"]
 new_molecule_tree = []
 generation = 0
 
+# NOTE: work BACKWARDS from finished molecule!!
 while medicine not in molecule_tree:
     new_molecule_tree = []
     generation += 1
