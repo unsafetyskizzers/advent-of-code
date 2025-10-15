@@ -1,6 +1,6 @@
 boss_base = {"hp": 104, "damage": 8, "armor": 1}
 player_base = {"hp": 100, "damage": 0, "armor": 0}
-inventory = [0, 0, 0]
+inventory = [0, 0, 0, 0] # weapon, armor, left ring, right ring
 
 shop_weapons = [
     {"cost": 0, "damage": 0, "armor": 0},
@@ -30,7 +30,9 @@ shop_rings = [
     {"cost": 100, "damage": 3, "armor": 0},
 ]
 
-shops = [shop_weapons, shop_armors, shop_rings]
+shops = [shop_weapons, shop_armors, shop_rings, shop_rings]
+
+# cheapest upgrade approach
 
 def cheapest_upgrade(inv):
     cheapest_upgrade = [0, 0, 0]
@@ -58,20 +60,31 @@ def simulate_battle():
     while player_boosted["hp"] > 0 and boss_sim["hp"] > 0:
         boss_sim["hp"] -= max(player_boosted["damage"] - boss_base["armor"], 1)
         player_boosted["hp"] -= max(boss_base["damage"] - player_boosted["armor"], 1)
-        print("Turn", turn, "Boss HP:", boss_sim["hp"], "Player HP:", player_boosted["hp"])
+        #print("Turn", turn, "Boss HP:", boss_sim["hp"], "Player HP:", player_boosted["hp"])
         turn += 1
-    if player_boosted["hp"] > 0: print("Player wins")
-    else: print("Boss wins")
+    if player_boosted["hp"] > 0: print("Player wins. Inventory:", inventory)
+    else: print("Boss wins. Inventory:", inventory)
     return player_boosted["hp"] > 0
 
-while True:
-    inventory = cheapest_upgrade(inventory)
-    if simulate_battle():
-        break
+# brute force approach
 
-inventory_cost = 0
-for i in range(len(inventory)):
-    inventory_cost += shops[i][inventory[i]]["cost"]
+cheapest_victory = -1
 
-print("Inventory cost:", inventory_cost, "Inventory:", inventory)
-# this answer is wrong! TODO check for highest stat point to gold ratio instead of cheapest upgrade in new algorithm
+for weapon in range(len(shop_weapons)):
+    inventory[0] = weapon
+    for armor in range(len(shop_armors)):
+        inventory[1] = armor
+        for leftring in range(len(shop_rings)):
+            inventory[2] = leftring
+            for rightring in range(len(shop_rings)):
+                if rightring == leftring and rightring != 0:
+                    continue
+                inventory[3] = rightring
+                if simulate_battle():
+                    victory_cost = 0
+                    for i in range(len(inventory)):
+                        victory_cost += shops[i][inventory[i]]["cost"]
+                    if victory_cost < cheapest_victory or cheapest_victory == -1:
+                        cheapest_victory = victory_cost
+
+print("Cheapest victory:", cheapest_victory)
