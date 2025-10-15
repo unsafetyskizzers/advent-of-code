@@ -15,7 +15,7 @@ shop_armors = [
     {"cost": 0, "damage": 0, "armor": 0},
     {"cost": 13, "damage": 0, "armor": 1},
     {"cost": 31, "damage": 0, "armor": 2},
-    {"cost": 51, "damage": 0, "armor": 3},
+    {"cost": 53, "damage": 0, "armor": 3},
     {"cost": 75, "damage": 0, "armor": 4},
     {"cost": 102, "damage": 0, "armor": 5},
 ]
@@ -32,7 +32,7 @@ shop_rings = [
 
 shops = [shop_weapons, shop_armors, shop_rings]
 
-def get_stronger(inv):
+def cheapest_upgrade(inv):
     cheapest_upgrade = [0, 0, 0]
     cheapest_upgrade_cost = 999999
     for i in range(len(inv)):
@@ -44,6 +44,9 @@ def get_stronger(inv):
         inv[i] += cheapest_upgrade[i]
     print("Bought", cheapest_upgrade, "with", cheapest_upgrade_cost, "more gold")
     return inv
+
+def highest_ratio(inv):
+    h_ratio = 0
 
 def simulate_battle():
     player_boosted = {"hp": 100, "damage": 0, "armor": 0}
@@ -62,7 +65,7 @@ def simulate_battle():
     return player_boosted["hp"] > 0
 
 while True:
-    inventory = get_stronger(inventory)
+    inventory = cheapest_upgrade(inventory)
     if simulate_battle():
         break
 
@@ -71,3 +74,4 @@ for i in range(len(inventory)):
     inventory_cost += shops[i][inventory[i]]["cost"]
 
 print("Inventory cost:", inventory_cost, "Inventory:", inventory)
+# this answer is wrong! TODO check for highest stat point to gold ratio instead of cheapest upgrade in new algorithm
